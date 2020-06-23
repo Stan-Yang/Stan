@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>登录</title>
+<link rel="stylesheet" type="text/css" href="../static/css/login.css"  />
+<script type="text/javascript" src="../static/js/jquery.min.js"  ></script>
+</head>
+
+<body>
+<div id="wrapper" class="login-page">
+<div id="login_form" class="form">
+<form class="register-form">
+<input type="text" placeholder="用户名" value="sysadmin" id="r_user_name" />
+<input type="password" placeholder="密码" value="123456" id="r_password" autocomplete="new-password" />
+<input type="text" placeholder="电子邮件" id="r_emial" />
+<button id="create">创建账户</button>
+<p class="message">已经有了一个账户? <a href="#">立刻登录</a></p>
+</form>
+<form class="login-form">
+ <h2>管理登录</h2>
+<input type="text" placeholder="用户名" value="sysadmin" id="user_name" />
+<input type="password" placeholder="密码" value="123456" id="password" autocomplete="new-password" />
+<button id="login">登　录</button>
+<p class="message">还没有账户? <a href="#">立刻创建</a></p>
+</form>
+</div>
+</div>
+
+<script type="text/javascript">
+	function check_login()
+	{
+	    var username=$("#user_name").val();
+	    var password=$("#password").val();
+	    var rememberMe=false;
+        $.ajax({
+            type: "post",
+            url: "/login",
+            dataType:"json",
+            data: {
+                "username": username,
+                "password": password,
+                "rememberMe": rememberMe
+            },
+            success: function(json) {
+                if (json.code == "0") {
+                    location.href = '/index';
+                } else {
+                    alert(json.msg);
+                    $("#login_form").removeClass('shake_effect');
+                    setTimeout(function()
+                    {
+                        $("#login_form").addClass('shake_effect')
+                    },1);
+                }
+            }
+        });
+	}
+	function check_register(){
+		var name = $("#r_user_name").val();
+		var pass = $("#r_password").val();
+		var email = $("r_email").val();
+		if(name!="" && pass=="" && email != "")
+		 {
+		  alert("注册成功！");
+		  $("#user_name").val("");
+		  $("#password").val("");
+		 }
+		 else
+		 {
+		  $("#login_form").removeClass('shake_effect');  
+		  setTimeout(function()
+		  {
+		   $("#login_form").addClass('shake_effect')
+		  },1);  
+		 }
+	}
+	$(function(){
+		$("#create").click(function(){
+			check_register();
+			return false;
+		})
+		$("#login").click(function(){
+			check_login();
+			return false;
+		})
+		$('.message a').click(function () {
+		    $('form').animate({
+		        height: 'toggle',
+		        opacity: 'toggle'
+		    }, 'slow');
+		});
+	})
+	</script>
+</body>
+</html>

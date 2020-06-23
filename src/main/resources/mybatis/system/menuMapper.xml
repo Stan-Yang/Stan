@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stan.system.menu.mapper.MenuMapper">
+
+    <resultMap id="ResultMenu" type="com.stan.system.menu.entity.MenuInfo">
+        <id     property="menuid"     column="menuid"     />
+        <result property="pid"   column="pid"   />
+        <result property="level"   column="level"   />
+        <result property="menuname"   column="menuname"   />
+        <result property="url"   column="url"   />
+        <result property="menutype"   column="menutype"   />
+        <result property="perms"   column="perms"   />
+        <result property="icon"   column="icon"   />
+        <result property="remark"   column="remark"   />
+        <result property="creates"   column="creates"   />
+        <result property="createdate"   column="createdate"   />
+        <result property="isdelete"   column="isdelete"   />
+        <result property="morder"   column="m_order"   />
+    </resultMap>
+
+    <select id="findById"  parameterType="Integer" resultMap="ResultMenu">
+        select * from stan_menu where menuid=#{value} and isdelete='0'
+    </select>
+
+    <select id="findByRoleid"  parameterType="Integer" resultMap="ResultMenu">
+       SELECT m.* FROM stan_menu m
+       LEFT JOIN stan_role_menu rm ON m.`menuid`=rm.`menuid`
+       WHERE rm.roleid=#{value}
+    </select>
+
+    <select id="findByPid"  parameterType="Integer" resultMap="ResultMenu">
+        select * from stan_menu where pid=#{value} and isdelete='0' order by m_order
+    </select>
+
+    <select id="findMenuList" parameterType="java.util.Map" resultMap="ResultMenu">
+        SELECT * FROM stan_menu
+    </select>
+
+    <insert id="insertMenu" parameterType="com.stan.system.menu.entity.MenuInfo">
+        INSERT INTO stan_menu(
+        menuid,
+        pid,
+        level,
+        menuname,
+        url,
+        menutype,
+        perms,
+        icon,
+        remark,
+        creates,
+        createdate,
+        isdelete,
+        m_order
+        ) VALUES(
+        #{menuid},
+        #{pid},
+        #{level},
+        #{menuname},
+        #{url},
+        #{menutype},
+        #{perms},
+        #{icon},
+        #{remark},
+        #{creates},
+        #{createdate},
+        #{isdelete},
+        #{morder}
+        )
+        <selectKey keyProperty="menuid" keyColumn="menuid" resultType="Integer" order="AFTER">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="updateMenu" parameterType="com.stan.system.menu.entity.MenuInfo">
+        UPDATE stan_menu SET
+        pid=#{pid},
+        menuname=#{menuname},
+        url=#{url},
+        menutype=#{menutype},
+        perms=#{perms},
+        url=#{url},
+        icon=#{icon},
+        creates=#{creates},
+        createdate=#{createdate},
+        isdelete=#{isdelete},
+        m_order=#{morder}
+         WHERE menuid=#{menuid}
+    </update>
+
+    <update id="deleteMenu" parameterType="Integer">
+        UPDATE stan_menu SET isdelete='1' where menuid=#{value}
+    </update>
+
+
+</mapper>

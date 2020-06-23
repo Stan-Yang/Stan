@@ -1,0 +1,43 @@
+# 项目相关配置
+stan:
+  #名称
+  name: Stan
+  #版本
+  version: 2.3.0
+  #版权年份
+  copyrightYear: 2019
+  #头像上传路径
+  profile: D:/profile/
+  #项目路径
+  dir: D:/IdeaProjects/Stan
+#基础配置
+server:
+  servlet:
+    context-path: /
+  port: 80
+debug: false
+#spring配置
+spring:
+  #文件上传
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  profiles:
+    active: druid
+  thymeleaf:
+    mode: HTML5
+    encoding: utf-8
+    cache: false
+    suffix:  .html
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+#mybatis配置
+mybatis:
+  config-location: classpath:mybatis/mybatis-config.xml
+  mapper-locations: classpath:mybatis/system/*.xml
+#日志配置
+logging:
+  level:
+    com.stan.*.mapper: debug

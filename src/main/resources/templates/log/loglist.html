@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title>欢迎页面-L-admin1.0</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="../css/font.css">
+  <link rel="stylesheet" href="../css/xadmin.css">
+  <script src="../js/jquery.min.js"></script>
+  <script type="text/javascript" src="../lib/layui/layui.js" charset="utf-8"></script>
+  <script type="text/javascript" src="../js/xadmin.js"></script>
+  <script type="text/javascript" src="../stan/stan.js"></script>
+</head>
+
+<body class="layui-anim layui-anim-up">
+<div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a>
+          <cite>日志管理</cite></a>
+      </span>
+  <a class="layui-btn layui-btn-primary layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+    <i class="layui-icon" style="line-height:38px">ဂ</i></a>
+</div>
+<div class="x-body">
+  <div class="layui-row">
+    <form class="layui-form layui-col-md12 x-so" >
+      <input type="hidden" name="pageNum" id="pageNum" th:value="${pageInfo.pageNum}">
+      <input type="hidden" name="pageSize" id="pageSize" th:value="${pageInfo.pageSize}">
+      <input type="text" name="remark" id="remark" placeholder="描述" th:value="${loginfo.remark}" autocomplete="off" class="layui-input">
+      <input type="text" name="operator" id="operator" placeholder="操作人" th:value="${loginfo.operator}" autocomplete="off" class="layui-input">
+      <input class="layui-input" placeholder="开始时间" name="starttime" id="start" th:value="${starttime}">
+      <input class="layui-input" placeholder="截止时间" name="endtime" id="end" th:value="${endtime}">
+      <button class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i>查询</button>
+    </form>
+  </div>
+  <xblock>
+    <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量删除</button>
+    <span class="x-right" style="line-height:40px">共有数据：[[${pageInfo.total}]] 条</span>
+  </xblock>
+  <table class="layui-table">
+    <thead>
+    <tr>
+      <th width="10px">
+        <div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div>
+      </th>
+      <th width="40px" >序号</th>
+      <th>日志描述</th>
+      <th>操作人</th>
+      <th>用户IP</th>
+      <th>浏览器信息</th>
+      <th>操作日期</th>
+      <th>操作时间</th>
+      <th>操作</th></tr>
+    </thead>
+    <tbody>
+    <tr th:each="loginfo,stat:${pageInfo.list}">
+      <td>
+        <div class="layui-unselect layui-form-checkbox" lay-skin="primary" th:data-id='${loginfo.logid}'><i class="layui-icon">&#xe605;</i></div>
+      </td>
+      <td>[[${stat.index+1}]]</td>
+      <td>[[${loginfo.remark}]]</td>
+      <td>[[${loginfo.operator}]]</td>
+      <td>[[${loginfo.IP}]]</td>
+      <td>[[${loginfo.browser}]]</td>
+      <td>[[${loginfo.operationdate}]]</td>
+      <td>[[${loginfo.operationtime}]]</td>
+      <td class="td-manage">
+        <a title="删除" onclick="member_del(this,this.getAttribute('logid'))" th:logid="${loginfo.logid}" href="javascript:;">
+          <i class="layui-icon">&#xe640;</i>
+        </a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+  <!--页码-->
+  <div id="page_no"></div>
+
+</div>
+<script>
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#start' //指定元素
+        });
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#end' //指定元素
+        });
+    });
+
+    layui.use(['laypage', 'layer'], function(){
+        var laypage = layui.laypage
+            ,layer = layui.layer;
+        var curr = [[${pageInfo.pageNum}]];
+        var count = [[${pageInfo.total}]];
+        var limit = [[${pageInfo.pageSize}]];
+        var start = 0;
+        //完整功能
+        laypage.render({
+            elem: 'page_no'
+            ,count: count //数据总数
+            ,limit: limit //每页显示条数
+            ,curr: curr //当前页
+            ,layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip']
+            ,jump: function(obj){
+                $("#pageNum").val(obj.curr);
+                $("#pageSize").val(obj.limit);
+                if(start!=0){
+                    $(".layui-form").submit();
+                    console.log(obj);
+                }
+                start++;
+            }
+        });
+    });
+
+    /*用户-删除*/
+    function member_del(obj,id){
+
+        layer.confirm('确认要删除吗？',function(index){
+            $.ajax({
+                url:"/log/delete",
+                type:"post",
+                dataType:"json",
+                data:{
+                    logid:id
+                },
+                success:function(json){
+                    if(json.code=="0"){
+                        location.replace(location.href);
+                    }else{
+                        layer.msg(json.msg,{icon:5,time:2000});
+                    }
+                }
+            });
+        });
+    }
+
+    /**
+     * 批量删除
+     *
+     * */
+    function delAll (argument) {
+        var data = tableCheck.getData();
+        layer.confirm('确认要删除吗？',function(index){
+            $.ajax({
+                url:"/log/deletes",
+                type:"post",
+                dataType:"json",
+                data:{
+                    logids:data.toString()
+                },
+                success:function(json){
+                    if(json.code=="0"){
+                        location.replace(location.href);
+                    }else{
+                        layer.msg(json.msg,{icon:5,time:2000});
+                    }
+                }
+            });
+
+        });
+    }
+</script>
+</body>
+
+</html>

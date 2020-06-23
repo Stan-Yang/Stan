@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stan.system.goods.mapper.GoodsMapper">
+    <resultMap id="ResultGoods" type="com.stan.system.goods.entity.GoodsInfo">
+        <id property="goodsid" column="goodsid" />
+        <result property="goodsname" column="goodsname" />
+        <result property="goodsremark" column="goodsremark" />
+        <result property="goodsprice" column="goodsprice" />
+        <result property="goodsnumber" column="goodsnumber" />
+        <result property="createdate" column="createdate" />
+        <result property="isdelete" column="isdelete" />
+    </resultMap>
+
+    <select id="findByList" parameterType="java.util.Map" resultMap="ResultGoods">
+        select goodsid,goodsname,goodsremark,goodsprice,goodsnumber,createdate,isdelete from stan_goods where isdelete='0'
+        <if test="goodsname != null and goodsname !=''">
+            and goodsname like concat(concat('%',#{goodsname}),'%')
+        </if>
+    </select>
+
+    <select id="findById"  parameterType="Integer" resultMap="ResultGoods">
+        select * from stan_goods where isdelete='0' and goodsid=#{goodsid}
+    </select>
+
+    <insert id="insertGoods" parameterType="com.stan.system.goods.entity.GoodsInfo">
+        INSERT into stan_goods(
+        goodsid,
+        goodsname,
+        goodsremark,
+        goodsprice,
+        goodsnumber,
+        createdate,
+        isdelete
+        ) values (
+        #{goodsid},
+        #{goodsname},
+        #{goodsremark},
+        #{goodsprice},
+        #{goodsnumber},
+        CURDATE(),
+        '0'
+        )
+        <selectKey keyProperty="goodsid" keyColumn="goodsid" resultType="Integer" order="AFTER">
+            select LAST_INSERT_ID();
+        </selectKey>
+    </insert>
+
+    <update id="updateGoods" parameterType="com.stan.system.goods.entity.GoodsInfo" >
+        update stan_goods set
+
+        <if test="createdate != null and createdate !=''">
+            createdate=#{createdate},
+        </if>
+        <if test="isdelete != null and isdelete !=''">
+            isdelete=#{isdelete},
+        </if>
+        goodsname=#{goodsname},
+        goodsremark=#{goodsremark}
+        where goodsid=#{goodsid}
+    </update>
+
+    <delete id="deleteGoods" parameterType="Integer">
+        update stan_goods set isdelete='1' where goodsid=#{goodsid}
+    </delete>
+</mapper>
