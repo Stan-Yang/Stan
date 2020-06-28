@@ -16,7 +16,7 @@ public class StanApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
         SpringApplication.run(StanApplication.class, args);
-        System.out.println("-------------------网站后台管理系统启动成功-----------------------");
+        System.out.println("-------------------网站后台管理系统启动成功1111-----------------------");
     }
 
     //重写configure方法，否则在部署到tomcat时，接口将访问不到
