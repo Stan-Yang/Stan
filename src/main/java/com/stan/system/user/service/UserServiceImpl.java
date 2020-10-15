@@ -1,5 +1,8 @@
 package com.stan.system.user.service;
 
+import com.stan.framework.aspectj.lang.annotation.Log;
+import com.stan.framework.aspectj.lang.annotation.ReadOnly;
+import com.stan.framework.aspectj.lang.constant.BusinessType;
 import com.stan.system.login.SysUser;
 import com.stan.system.user.entity.UserInfo;
 import com.stan.system.user.mapper.UserMapper;
@@ -8,6 +11,7 @@ import com.stan.utils.StringUtil;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Lazy
 public class UserServiceImpl implements IUserService {
 
     @Autowired
@@ -23,7 +28,10 @@ public class UserServiceImpl implements IUserService {
     @Autowired
     private SysUser sysUser;
 
+
+    @ReadOnly
     public List<UserInfo> findByList(Map param){
+        System.out.println("-------------------");
         return userMapper.findByList(param);
     }
 
